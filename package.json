@@ -1,0 +1,21 @@
+{
+  "name": "ics-generator",
+  "version": "1.0.0",
+  "description": "Scrape Fillum film screenings and generate a lifelong Google Calendar ICS",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "postinstall": "playwright install --with-deps"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0",
+    "ics": "^2.41.0",
+    "luxon": "^3.4.4",
+    "playwright": "^1.42.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
