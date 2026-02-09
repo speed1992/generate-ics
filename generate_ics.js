@@ -4,7 +4,7 @@ import fs from "fs";
 import { DateTime } from "luxon";
 
 const URL = "https://fillum.in/film-screenings-in-delhi";
-const OUTPUT = "delhi-screenings.ics";
+const OUTPUT = "feed.ics";
 
 async function autoScroll(page) {
   await page.evaluate(async () => {
