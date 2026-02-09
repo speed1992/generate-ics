@@ -47,6 +47,11 @@ async function scrapeFillum() {
 }
 
 function buildICS(eventsRaw) {
+  if (!eventsRaw || eventsRaw.length === 0) {
+    console.log("No events found — skipping ICS generation");
+    return;
+  }
+
   const events = [];
 
   for (const e of eventsRaw) {
@@ -58,26 +63,25 @@ function buildICS(eventsRaw) {
 
     events.push({
       title: e.title,
-      start: [
-        dt.year,
-        dt.month,
-        dt.day,
-        dt.hour,
-        dt.minute
-      ],
+      start: [dt.year, dt.month, dt.day, dt.hour, dt.minute],
       duration: { hours: 2 },
       location: e.venue,
       url: e.link,
-      description:
-        `Delhi Film Screening\n\n${e.title}\n\nVenue: ${e.venue}\nSource: Fillum.in\n\nCurated for lifelong cinema tracking.`,
-      status: "CONFIRMED",
-      busyStatus: "BUSY",
-      categories: ["Cinema", "Film", "Delhi"]
+      description: `Delhi Film Screening\n\n${e.title}\nVenue: ${e.venue}\nSource: Fillum.in`,
+      status: "CONFIRMED"
     });
   }
 
+  if (events.length === 0) {
+    console.log("No valid events after parsing — ICS not written");
+    return;
+  }
+
   const { error, value } = createEvents(events);
-  if (error) throw error;
+  if (error || !value) {
+    throw error || new Error("ICS generation failed");
+  }
+
   fs.writeFileSync(OUTPUT, value);
 }
 
