@@ -1,6 +1,6 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs-extra');
-const { createEvents } = require('ics');
+import puppeteer from 'puppeteer';
+import fs from 'fs-extra';
+import { createEvents } from 'ics';
 
 const URL = "https://in.bookmyshow.com/explore/plays-national-capital-region-ncr";
 const MAX_RETRIES = 5;
@@ -30,7 +30,7 @@ async function autoScroll(page) {
     let stallCount = 0;
 
     while (stallCount < MAX_STALLS) {
-        const currentHeight = await page.evaluate('document.body.scrollHeight');
+        const currentHeight = await page.evaluate(() => document.body.scrollHeight);
 
         if (currentHeight === previousHeight) {
             stallCount++;
@@ -40,7 +40,7 @@ async function autoScroll(page) {
 
         previousHeight = currentHeight;
 
-        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await sleep(SCROLL_DELAY);
     }
 }
@@ -49,6 +49,7 @@ function safeParseDate(dateText) {
     try {
         const date = new Date(dateText);
         if (isNaN(date)) return null;
+
         return [
             date.getFullYear(),
             date.getMonth() + 1,
@@ -61,7 +62,7 @@ function safeParseDate(dateText) {
     }
 }
 
-(async () => {
+async function main() {
     console.log("Launching browser...");
 
     const browser = await puppeteer.launch({
@@ -179,16 +180,17 @@ function safeParseDate(dateText) {
 
     console.log("Generating ICS...");
 
-    createEvents(icsEvents, (error, value) => {
-        if (error) {
-            console.log("ICS error:", error);
-            return;
-        }
+    const { error, value } = createEvents(icsEvents);
+
+    if (error) {
+        console.log("ICS error:", error);
+    } else {
         fs.writeFileSync("ncr_plays.ics", value);
         console.log("ICS created successfully.");
-    });
+    }
 
     await browser.close();
-
     console.log("DONE.");
-})();
+}
+
+main();
